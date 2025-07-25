@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Service Worker kayıt
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/zincir/sw.js')
+        navigator.serviceWorker.register('./sw.js', { scope: './' })
             .then(registration => console.log('Service Worker kayıt edildi:', registration))
             .catch(error => console.log('Service Worker kayıt hatası:', error));
     }
