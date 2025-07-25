@@ -199,3 +199,41 @@ input[type="radio"] {
 input[type="radio"]:checked {
     accent-color: #3B82F6;
 } 
+
+/* Bildirim zili animasyonu */
+@keyframes bellRing {
+    0% { transform: rotate(0); }
+    10% { transform: rotate(14deg); }
+    20% { transform: rotate(-8deg); }
+    30% { transform: rotate(14deg); }
+    40% { transform: rotate(-4deg); }
+    50% { transform: rotate(10deg); }
+    60% { transform: rotate(0); }
+    100% { transform: rotate(0); }
+}
+
+#reminder-settings-btn:hover i {
+    animation: bellRing 0.8s ease-in-out;
+}
+
+/* Bildirim badge */
+.notification-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ef4444;
+    color: white;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    animation: pulse 2s infinite;
+}
+
+/* Time input stilleri */
+input[type="time"] {
+    cursor: pointer;
+}
+
+input[type="time"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+} 

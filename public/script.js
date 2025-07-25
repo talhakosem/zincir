@@ -1,8 +1,241 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Service Worker kayıt
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => console.log('Service Worker kayıt edildi:', registration))
+            .catch(error => console.log('Service Worker kayıt hatası:', error));
+    }
+
     const goalInput = document.getElementById('goal-input');
     const addGoalBtn = document.getElementById('add-goal-btn');
     const goalsContainer = document.getElementById('goals-container');
     const frequencySelect = document.getElementById('frequency-select');
+
+    // Bildirim izni kontrol ve isteme
+    const checkNotificationPermission = async () => {
+        if ('Notification' in window) {
+            if (Notification.permission === 'default') {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    showNotification('Zinciri Kırma', 'Bildirimler aktif! Hedeflerini takip etmeyi unutma.', 'success');
+                }
+            }
+        }
+    };
+
+    // Bildirim gösterme fonksiyonu
+    const showNotification = (title, body, type = 'info') => {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            const icon = type === 'success' ? '✅' : type === 'reminder' ? '⏰' : '📋';
+            const notification = new Notification(title, {
+                body: body,
+                icon: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">${icon}</text></svg>`,
+                badge: `data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">🎯</text></svg>`,
+                tag: 'zinciri-kirma',
+                requireInteraction: type === 'reminder'
+            });
+
+            notification.onclick = () => {
+                window.focus();
+                notification.close();
+            };
+
+            setTimeout(() => notification.close(), type === 'reminder' ? 30000 : 5000);
+        }
+    };
+
+    // Hatırlatıcı ayarlarını yükle/kaydet
+    const loadReminderSettings = () => {
+        const settings = localStorage.getItem('reminderSettings');
+        return settings ? JSON.parse(settings) : {
+            enabled: true,
+            times: ['09:00', '14:00', '20:00'],
+            lastCheck: null
+        };
+    };
+
+    const saveReminderSettings = (settings) => {
+        localStorage.setItem('reminderSettings', JSON.stringify(settings));
+    };
+
+    // Hatırlatıcı kontrolü
+    const checkReminders = () => {
+        const settings = loadReminderSettings();
+        if (!settings.enabled) return;
+
+        const now = new Date();
+        const currentTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        const today = formatDate(now);
+
+        // Bugün için kontrol edilmemiş hatırlatıcı var mı?
+        settings.times.forEach(reminderTime => {
+            const lastCheckKey = `lastReminder_${reminderTime}_${today}`;
+            const wasChecked = localStorage.getItem(lastCheckKey);
+
+            if (currentTime >= reminderTime && !wasChecked) {
+                // Tamamlanmamış hedefleri kontrol et
+                const incompleteTasks = checkIncompleteTasks();
+                
+                if (incompleteTasks.length > 0) {
+                    const taskList = incompleteTasks.slice(0, 3).join(', ');
+                    const moreText = incompleteTasks.length > 3 ? ` ve ${incompleteTasks.length - 3} hedef daha` : '';
+                    
+                    showNotification(
+                        '⏰ Hedef Hatırlatıcısı', 
+                        `Bugün için bekleyen hedeflerin var: ${taskList}${moreText}`,
+                        'reminder'
+                    );
+                }
+
+                // Bu hatırlatıcının bugün gösterildiğini işaretle
+                localStorage.setItem(lastCheckKey, 'true');
+            }
+        });
+    };
+
+    // Tamamlanmamış hedefleri kontrol et
+    const checkIncompleteTasks = () => {
+        const today = formatDate(getToday());
+        const incompleteTasks = [];
+
+        goals.forEach(goal => {
+            const activeCycle = getActiveCycle(goal);
+            if (!activeCycle) return;
+
+            const startDate = parseDate(activeCycle.startDate);
+            const isRequired = isRequiredDay(getToday(), startDate, goal.frequency);
+            const isCompleted = activeCycle.completed.includes(today);
+
+            if (isRequired && !isCompleted) {
+                incompleteTasks.push(goal.name);
+            }
+        });
+
+        return incompleteTasks;
+    };
+
+    // Hatırlatıcı ayarları modalı
+    const showReminderSettingsModal = () => {
+        const settings = loadReminderSettings();
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+        
+        modal.innerHTML = `
+            <div class="bg-white p-6 rounded-lg max-w-md w-full">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold">Hatırlatıcı Ayarları</h3>
+                    <button class="close-modal text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="reminder-enabled" ${settings.enabled ? 'checked' : ''} class="mr-2">
+                        <span class="font-semibold">Hatırlatıcıları Aktif Et</span>
+                    </label>
+                </div>
+                
+                <div class="mb-4">
+                    <p class="font-semibold mb-2">Hatırlatma Saatleri:</p>
+                    <div id="reminder-times" class="space-y-2">
+                        ${settings.times.map((time, index) => `
+                            <div class="flex items-center gap-2">
+                                <input type="time" value="${time}" class="reminder-time p-2 border rounded" data-index="${index}">
+                                <button class="remove-time text-red-500 hover:text-red-700" data-index="${index}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="add-time mt-2 text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                        <i class="fas fa-plus"></i> Yeni Saat Ekle
+                    </button>
+                </div>
+                
+                <div class="mb-4 p-3 bg-yellow-50 rounded">
+                    <p class="text-sm text-gray-700">
+                        <i class="fas fa-info-circle text-yellow-600"></i>
+                        Hatırlatıcılar sadece bu sayfa açıkken çalışır. Daha güçlü bildirimler için sayfayı yer imlerine ekleyip sık sık ziyaret edin.
+                    </p>
+                </div>
+                
+                <button class="save-settings bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-600 transition-colors w-full">
+                    Ayarları Kaydet
+                </button>
+            </div>
+        `;
+
+        // Event listeners
+        const addTimeBtn = modal.querySelector('.add-time');
+        addTimeBtn.addEventListener('click', () => {
+            const timesContainer = modal.querySelector('#reminder-times');
+            const newIndex = timesContainer.children.length;
+            const newTimeDiv = document.createElement('div');
+            newTimeDiv.className = 'flex items-center gap-2';
+            newTimeDiv.innerHTML = `
+                <input type="time" value="12:00" class="reminder-time p-2 border rounded" data-index="${newIndex}">
+                <button class="remove-time text-red-500 hover:text-red-700" data-index="${newIndex}">
+                    <i class="fas fa-trash"></i>
+                </button>
+            `;
+            timesContainer.appendChild(newTimeDiv);
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-time')) {
+                e.target.closest('.flex').remove();
+            }
+        });
+
+        const saveBtn = modal.querySelector('.save-settings');
+        saveBtn.addEventListener('click', () => {
+            const enabled = modal.querySelector('#reminder-enabled').checked;
+            const times = Array.from(modal.querySelectorAll('.reminder-time')).map(input => input.value);
+            
+            saveReminderSettings({ enabled, times, lastCheck: null });
+            modal.remove();
+            
+            if (enabled && Notification.permission === 'default') {
+                checkNotificationPermission();
+            }
+            
+            showNotification('Ayarlar Kaydedildi', 'Hatırlatıcı ayarlarınız güncellendi.', 'success');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal || e.target.closest('.close-modal')) {
+                modal.remove();
+            }
+        });
+
+        document.body.appendChild(modal);
+    };
+
+    // Sayfa odaklanma kontrolü
+    let reminderInterval;
+    
+    const startReminderCheck = () => {
+        // Her dakika kontrol et
+        reminderInterval = setInterval(checkReminders, 60000);
+        // İlk kontrol
+        checkReminders();
+    };
+
+    const stopReminderCheck = () => {
+        if (reminderInterval) {
+            clearInterval(reminderInterval);
+        }
+    };
+
+    // Sayfa görünür olduğunda kontrol başlat
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopReminderCheck();
+        } else {
+            startReminderCheck();
+        }
+    });
 
     // Ödül önerileri listesi (30 adet)
     const rewardSuggestions = [
@@ -771,9 +1004,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderGoals();
             }
         }
+
+        // Hatırlatıcı ayarları
+        if (e.target.closest('.reminder-settings-btn')) {
+            showReminderSettingsModal();
+        }
     });
 
     // Başlangıç
     loadGoals();
     renderGoals();
+    
+    // Bildirim izni kontrolü ve hatırlatıcıları başlat
+    checkNotificationPermission();
+    startReminderCheck();
+    
+    // Hatırlatıcı ayarları butonu
+    const reminderSettingsBtn = document.getElementById('reminder-settings-btn');
+    if (reminderSettingsBtn) {
+        reminderSettingsBtn.addEventListener('click', showReminderSettingsModal);
+    }
 }); 

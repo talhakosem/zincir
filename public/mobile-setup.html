@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobil Kurulum - Zinciri Kırma</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4 max-w-2xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">📱 Mobil Kurulum Rehberi</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-2xl font-bold mb-4 text-blue-600">
+                <i class="fas fa-mobile-alt"></i> Android Chrome Kurulumu
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="border-l-4 border-blue-500 pl-4">
+                    <h3 class="font-semibold text-lg mb-2">1. Ana Ekrana Ekle</h3>
+                    <ol class="list-decimal list-inside space-y-2 text-gray-700">
+                        <li>Chrome'da bu sayfayı açın</li>
+                        <li>Sağ üstteki <strong>⋮</strong> menüye tıklayın</li>
+                        <li><strong>"Ana ekrana ekle"</strong> seçeneğini seçin</li>
+                        <li>İsmi onaylayın ve <strong>"Ekle"</strong> deyin</li>
+                    </ol>
+                </div>
+                
+                <div class="border-l-4 border-green-500 pl-4">
+                    <h3 class="font-semibold text-lg mb-2">2. Bildirimlere İzin Ver</h3>
+                    <button onclick="requestNotificationPermission()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
+                        <i class="fas fa-bell"></i> Bildirimleri Aktif Et
+                    </button>
+                    <p class="text-sm text-gray-600 mt-2">Butona tıklayın ve "İzin Ver" deyin</p>
+                </div>
+                
+                <div class="border-l-4 border-yellow-500 pl-4">
+                    <h3 class="font-semibold text-lg mb-2">3. Sistem Ayarları</h3>
+                    <ul class="space-y-1 text-gray-700">
+                        <li>📱 <strong>Ayarlar → Uygulamalar → Chrome</strong></li>
+                        <li>🔔 <strong>Bildirimler</strong> → Açık olmalı</li>
+                        <li>🌙 <strong>Rahatsız Etmeyin</strong> → Kapalı olmalı</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-blue-50 rounded-lg p-6 mb-6">
+            <h3 class="text-xl font-bold mb-3 text-blue-800">
+                <i class="fas fa-lightbulb"></i> Önemli İpuçları
+            </h3>
+            <ul class="space-y-2 text-gray-700">
+                <li>✅ Uygulama ana ekrana eklendikten sonra normal uygulama gibi çalışır</li>
+                <li>✅ Bildirimler için internet bağlantısı gerekir</li>
+                <li>✅ Pil tasarrufu modunda bildirimler gecikebilir</li>
+                <li>✅ Uygulamayı arka planda açık tutmanız gerekmez</li>
+            </ul>
+        </div>
+        
+        <div class="bg-gray-100 rounded-lg p-6 text-center">
+            <p class="text-gray-600 mb-4">Her şey tamam mı?</p>
+            <a href="index.html" class="bg-blue-500 text-white px-6 py-3 rounded-lg inline-block hover:bg-blue-600 transition-colors">
+                <i class="fas fa-arrow-left"></i> Uygulamaya Dön
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('Zinciri Kırma', {
+                            body: 'Bildirimler başarıyla aktif edildi! 🎉',
+                            icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y="80" font-size="80">🎯</text></svg>'
+                        });
+                    } else {
+                        alert('Bildirimler için izin vermeniz gerekiyor. Lütfen tarayıcı ayarlarından izin verin.');
+                    }
+                });
+            } else {
+                alert('Bu tarayıcı bildirimleri desteklemiyor.');
+            }
+        }
+    </script>
+</body>
+</html> 
