@@ -1,0 +1,16 @@
+# Zinciri Kırma Uygulaması için yönlendirmeler
+RewriteEngine On
+RewriteBase /zincir/
+
+# Ana sayfa için index.html'i göster
+RewriteRule ^$ index.html [L]
+
+# Service Worker için doğru MIME type
+<FilesMatch "sw\.js$">
+    Header set Service-Worker-Allowed "/"
+</FilesMatch>
+
+# Manifest dosyası için doğru MIME type
+<FilesMatch "manifest\.json$">
+    AddType application/manifest+json .json
+</FilesMatch> 

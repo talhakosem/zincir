@@ -1,11 +1,12 @@
 // Service Worker - Zinciri Kırma
-const CACHE_NAME = 'zinciri-kirma-v1';
+const CACHE_NAME = 'zinciri-kirma-v2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style.css',
-  '/script.js',
-  '/manifest.json'
+  '/zincir/',
+  '/zincir/index.html',
+  '/zincir/style.css',
+  '/zincir/script.js',
+  '/zincir/manifest.json',
+  '/zincir/mobile-setup.html'
 ];
 
 // Install Service Worker
