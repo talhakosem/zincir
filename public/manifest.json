@@ -1,10 +1,10 @@
 {
-  "id": "/?source=pwa",
+  "id": "zincir-app",
   "name": "Zinciri Kırma",
   "short_name": "Zincir",
   "description": "Kişisel hedef takip ve alışkanlık geliştirme uygulaması",
-  "start_url": "./index.html?source=pwa",
-  "scope": "./",
+  "start_url": "https://tayadm.com/zincir/",
+  "scope": "https://tayadm.com/zincir/",
   "display": "standalone",
   "background_color": "#f3f4f6",
   "theme_color": "#3b82f6",
