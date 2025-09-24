@@ -12,6 +12,55 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
+/* Force dark mode styles */
+.dark body {
+    background-color: #111827 !important;
+}
+
+.dark .bg-gray-100 {
+    background-color: #111827 !important;
+}
+
+.dark .bg-white {
+    background-color: #1f2937 !important;
+}
+
+.dark .text-gray-800 {
+    color: #f9fafb !important;
+}
+
+.dark .text-gray-600 {
+    color: #d1d5db !important;
+}
+
+/* Specific dark mode overrides for main elements */
+.dark .container {
+    background-color: #111827 !important;
+}
+
+.dark .bg-white {
+    background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-100 {
+    background-color: #111827 !important;
+}
+
+/* Input and form elements */
+.dark input[type="text"],
+.dark input[type="time"],
+.dark select,
+.dark textarea {
+    background-color: #374151 !important;
+    color: #f9fafb !important;
+    border-color: #4b5563 !important;
+}
+
+.dark input[type="text"]::placeholder,
+.dark textarea::placeholder {
+    color: #9ca3af !important;
+}
+
 /* Dark mode modal styles */
 .dark .fixed > div {
     background-color: #1f2937;
@@ -130,6 +179,7 @@ body {
     z-index: 1;
     border-radius: 1px;
     box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
 }
 
 /* Tamamlanan günler için güçlü zincir bağlantısı */
@@ -137,6 +187,25 @@ body {
     background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.9) 100%);
     box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
     height: 3px;
+    width: 10px;
+}
+
+/* Ardışık tamamlanan günler için özel zincir bağlantısı */
+.day-marker.bg-green-500.connected:not(:last-child)::after {
+    background: linear-gradient(90deg, rgba(34,197,94,0.8) 0%, rgba(34,197,94,0.6) 50%, rgba(34,197,94,0.8) 100%);
+    box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+    height: 4px;
+    width: 12px;
+    animation: chainGlow 2s ease-in-out infinite;
+}
+
+@keyframes chainGlow {
+    0%, 100% { 
+        box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
+    }
+    50% { 
+        box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+    }
 }
 
 /* Kırık zincir bağlantısı */
@@ -265,6 +334,39 @@ body {
     padding: 8px 0;
     border-radius: 20px;
     position: relative;
+}
+
+/* Zincir bağlantı çizgisi - tüm zincir boyunca */
+.chain-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(255,255,255,0.1) 20%, 
+        rgba(255,255,255,0.2) 50%, 
+        rgba(255,255,255,0.1) 80%, 
+        transparent 100%
+    );
+    transform: translateY(-50%);
+    z-index: 0;
+    border-radius: 1px;
+}
+
+/* Bağlantılı zincirler için özel çizgi */
+.chain-container.has-connections::before {
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(34,197,94,0.3) 20%, 
+        rgba(34,197,94,0.5) 50%, 
+        rgba(34,197,94,0.3) 80%, 
+        transparent 100%
+    );
+    height: 3px;
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
 }
 
 /* Zincir geçmişi vurgusu */

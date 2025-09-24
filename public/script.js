@@ -15,36 +15,47 @@ document.addEventListener('DOMContentLoaded', () => {
         const isDarkMode = localStorage.getItem('darkMode') === 'true';
         if (isDarkMode) {
             body.classList.add('dark');
+            document.documentElement.classList.add('dark');
             updateDarkModeIcon(true);
         } else {
             body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
             updateDarkModeIcon(false);
         }
     };
     
     // Update dark mode icon
     const updateDarkModeIcon = (isDarkMode) => {
+        if (!darkModeToggle) return;
         const icon = darkModeToggle.querySelector('i');
-        if (isDarkMode) {
-            icon.className = 'fas fa-sun text-xl';
-            darkModeToggle.title = 'Açık Mod';
-        } else {
-            icon.className = 'fas fa-moon text-xl';
-            darkModeToggle.title = 'Karanlık Mod';
+        if (icon) {
+            if (isDarkMode) {
+                icon.className = 'fas fa-sun text-xl';
+                darkModeToggle.title = 'Açık Mod';
+            } else {
+                icon.className = 'fas fa-moon text-xl';
+                darkModeToggle.title = 'Karanlık Mod';
+            }
         }
     };
     
     // Toggle dark mode
     const toggleDarkMode = () => {
         const isDarkMode = body.classList.contains('dark');
+        console.log('Current dark mode state:', isDarkMode); // Debug log
+        
         if (isDarkMode) {
             body.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
             localStorage.setItem('darkMode', 'false');
             updateDarkModeIcon(false);
+            console.log('Switched to light mode'); // Debug log
         } else {
             body.classList.add('dark');
+            document.documentElement.classList.add('dark');
             localStorage.setItem('darkMode', 'true');
             updateDarkModeIcon(true);
+            console.log('Switched to dark mode'); // Debug log
         }
     };
     
@@ -224,8 +235,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const newTimeDiv = document.createElement('div');
             newTimeDiv.className = 'flex items-center gap-2';
             newTimeDiv.innerHTML = `
-                <input type="time" value="12:00" class="reminder-time p-2 border rounded" data-index="${newIndex}">
-                <button class="remove-time text-red-500 hover:text-red-700" data-index="${newIndex}">
+                <input type="time" value="12:00" class="reminder-time p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded transition-colors" data-index="${newIndex}">
+                <button class="remove-time text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" data-index="${newIndex}">
                     <i class="fas fa-trash"></i>
                 </button>
             `;
@@ -594,25 +605,25 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let rewardsContent = '';
         if (goal.rewards.length === 0) {
-            rewardsContent = '<p class="text-gray-500">Henüz kazanılmış ödül yok. 10 günlük seriye ulaştığında ilk ödülün seni bekliyor!</p>';
+            rewardsContent = '<p class="text-gray-500 dark:text-gray-400">Henüz kazanılmış ödül yok. 10 günlük seriye ulaştığında ilk ödülün seni bekliyor!</p>';
         } else {
             rewardsContent = goal.rewards.reverse().map((reward, index) => `
-                <div class="border-b pb-4 mb-4 last:border-b-0">
+                <div class="border-b border-gray-200 dark:border-gray-600 pb-4 mb-4 last:border-b-0">
                     <div class="flex justify-between items-start mb-2">
                         <div>
-                            <h4 class="font-semibold">${reward.streak} Günlük Seri Ödülü</h4>
-                            <p class="text-sm text-gray-600">${parseDate(reward.date).toLocaleDateString('tr-TR')}</p>
+                            <h4 class="font-semibold text-gray-800 dark:text-white">${reward.streak} Günlük Seri Ödülü</h4>
+                            <p class="text-sm text-gray-600 dark:text-gray-300">${parseDate(reward.date).toLocaleDateString('tr-TR')}</p>
                         </div>
                         <span class="reward-status px-3 py-1 rounded-full text-xs font-semibold ${
-                            reward.completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                            reward.completed ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200' : 'bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200'
                         }">
                             ${reward.completed ? 'Yapıldı' : 'Bekliyor'}
                         </span>
                     </div>
-                    <p class="text-gray-700 italic mb-2">"${reward.suggestion}"</p>
-                    ${reward.notes ? `<p class="text-sm text-gray-600 bg-gray-50 p-2 rounded">💭 ${reward.notes}</p>` : ''}
+                    <p class="text-gray-700 dark:text-gray-300 italic mb-2">"${reward.suggestion}"</p>
+                    ${reward.notes ? `<p class="text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-700 p-2 rounded">💭 ${reward.notes}</p>` : ''}
                     ${!reward.completed ? `
-                        <button class="mt-2 text-blue-600 hover:text-blue-800 text-sm font-semibold complete-reward-btn" 
+                        <button class="mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-semibold complete-reward-btn" 
                                 data-goal-index="${goalIndex}" data-reward-index="${goal.rewards.length - 1 - index}">
                             Ödülü Değerlendir
                         </button>
@@ -761,7 +772,7 @@ document.addEventListener('DOMContentLoaded', () => {
         goalsContainer.innerHTML = '';
         
         if (goals.length === 0) {
-            goalsContainer.innerHTML = '<p class="text-center text-gray-500">Henüz bir hedef eklemediniz.</p>';
+            goalsContainer.innerHTML = '<p class="text-center text-gray-500 dark:text-gray-400">Henüz bir hedef eklemediniz.</p>';
             return;
         }
 
@@ -826,21 +837,42 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="absolute top-0 left-0 h-full bg-white bg-opacity-10" style="width: ${cycleStats.percentage}%; transition: width 1s ease-out;"></div>
             `;
 
-            const calendarHtml = days.map(day => `
-                <div class="text-center flex-shrink-0">
-                    <div class="text-xs">${day.dayName}</div>
-                    <div class="font-bold text-base">${day.dayNum}</div>
-                    <div 
-                        class="day-marker w-7 h-7 mx-auto rounded-full cursor-pointer flex items-center justify-center ${day.className} ${day.isFuture ? 'opacity-50 cursor-not-allowed' : ''}"
-                        data-goal-index="${goalIndex}"
-                        data-date="${day.dateStr}"
-                        title="${day.isRequired ? 'Gerekli Gün' : 'Opsiyonel Gün'}"
-                        ${day.isFuture ? 'disabled' : ''}
-                    >
-                        ${day.isCompleted ? '<i class="fas fa-link text-white text-xs chain-icon"></i>' : ''}
+            // Zincir bağlantılarını hesapla
+            const connectedDays = new Set();
+            let hasConnections = false;
+            
+            for (let i = 0; i < days.length - 1; i++) {
+                const currentDay = days[i];
+                const nextDay = days[i + 1];
+                
+                // Eğer mevcut gün ve sonraki gün tamamlanmışsa ve ardışıksa
+                if (currentDay.isCompleted && nextDay.isCompleted && 
+                    currentDay.isRequired && nextDay.isRequired) {
+                    connectedDays.add(i);
+                    hasConnections = true;
+                }
+            }
+
+            const calendarHtml = days.map((day, index) => {
+                const isConnected = connectedDays.has(index);
+                const connectionClass = isConnected ? 'connected' : '';
+                
+                return `
+                    <div class="text-center flex-shrink-0">
+                        <div class="text-xs">${day.dayName}</div>
+                        <div class="font-bold text-base">${day.dayNum}</div>
+                        <div 
+                            class="day-marker w-7 h-7 mx-auto rounded-full cursor-pointer flex items-center justify-center ${day.className} ${connectionClass} ${day.isFuture ? 'opacity-50 cursor-not-allowed' : ''}"
+                            data-goal-index="${goalIndex}"
+                            data-date="${day.dateStr}"
+                            title="${day.isRequired ? 'Gerekli Gün' : 'Opsiyonel Gün'}${isConnected ? ' - Zincir Bağlantılı' : ''}"
+                            ${day.isFuture ? 'disabled' : ''}
+                        >
+                            ${day.isCompleted ? '<i class="fas fa-link text-white text-xs chain-icon"></i>' : ''}
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
 
             // Geçmiş döngü sayısı
             const totalCycles = goal.history.length + 1;
@@ -885,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="overflow-x-auto pb-2">
-                        <div class="flex space-x-2 min-w-max chain-container">
+                        <div class="flex space-x-2 min-w-max chain-container ${hasConnections ? 'has-connections' : ''}">
                             ${calendarHtml}
                         </div>
                     </div>
@@ -910,7 +942,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let historyContent = '';
         if (goal.history.length === 0) {
-            historyContent = '<p class="text-gray-500">Henüz tamamlanmış döngü yok.</p>';
+            historyContent = '<p class="text-gray-500 dark:text-gray-400">Henüz tamamlanmış döngü yok.</p>';
         } else {
             historyContent = goal.history.map((cycle, index) => {
                 const startDate = parseDate(cycle.startDate);
@@ -918,13 +950,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 const duration = Math.floor((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
                 
                 return `
-                    <div class="border-b pb-3 mb-3">
-                        <h4 class="font-semibold">Döngü ${index + 1}</h4>
-                        <p class="text-sm text-gray-600">
+                    <div class="border-b border-gray-200 dark:border-gray-600 pb-3 mb-3">
+                        <h4 class="font-semibold text-gray-800 dark:text-white">Döngü ${index + 1}</h4>
+                        <p class="text-sm text-gray-600 dark:text-gray-300">
                             ${startDate.toLocaleDateString('tr-TR')} - ${endDate.toLocaleDateString('tr-TR')} 
                             (${duration} gün)
                         </p>
-                        <p class="text-sm">
+                        <p class="text-sm text-gray-700 dark:text-gray-300">
                             Başarı: %${cycle.stats.percentage} 
                             (${cycle.stats.completed}/${cycle.stats.required} gün)
                         </p>
@@ -934,10 +966,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         modal.innerHTML = `
-            <div class="bg-white p-6 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto transition-colors">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold">${goal.name} - Geçmiş</h3>
-                    <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">${goal.name} - Geçmiş</h3>
+                    <button class="close-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
