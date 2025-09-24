@@ -2,6 +2,71 @@ body {
     font-family: 'Inter', sans-serif;
 }
 
+/* Dark mode styles */
+.dark {
+    color-scheme: dark;
+}
+
+/* Dark mode transitions */
+* {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Dark mode modal styles */
+.dark .fixed > div {
+    background-color: #1f2937;
+    color: #f9fafb;
+}
+
+.dark .bg-white {
+    background-color: #1f2937;
+}
+
+.dark .text-gray-800 {
+    color: #f9fafb;
+}
+
+.dark .text-gray-600 {
+    color: #d1d5db;
+}
+
+.dark .text-gray-700 {
+    color: #e5e7eb;
+}
+
+.dark .border {
+    border-color: #374151;
+}
+
+.dark .bg-yellow-50 {
+    background-color: #451a03;
+}
+
+.dark .text-yellow-600 {
+    color: #fbbf24;
+}
+
+.dark .bg-gray-50 {
+    background-color: #374151;
+}
+
+.dark .text-gray-500 {
+    color: #9ca3af;
+}
+
+/* Dark mode scrollbar */
+.dark .overflow-x-auto::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.dark .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.dark .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
 /* Modal animasyonu */
 @keyframes modalFadeIn {
     from {
@@ -45,21 +110,126 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Başarılı gün animasyonu */
-@keyframes checkIn {
-    0% {
-        transform: scale(0);
+/* Zincir halka tasarımı */
+.day-marker {
+    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+/* Zincir bağlantısı - halkalar arasındaki çizgiler */
+.day-marker:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -12px;
+    width: 8px;
+    height: 3px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0.6) 100%);
+    transform: translateY(-50%);
+    z-index: 1;
+    border-radius: 1px;
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.3);
+}
+
+/* Tamamlanan günler için güçlü zincir bağlantısı */
+.day-marker.bg-green-500:not(:last-child)::after {
+    background: linear-gradient(90deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 50%, rgba(255,255,255,0.9) 100%);
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.5);
+    height: 3px;
+}
+
+/* Kırık zincir bağlantısı */
+.day-marker.bg-red-400:not(:last-child)::after {
+    background: linear-gradient(90deg, rgba(239,68,68,0.8) 0%, transparent 30%, transparent 70%, rgba(239,68,68,0.8) 100%);
+    box-shadow: 0 0 3px rgba(239, 68, 68, 0.4);
+    height: 2px;
+    animation: brokenLink 2s ease-in-out infinite;
+}
+
+@keyframes brokenLink {
+    0%, 100% { 
+        opacity: 0.6;
+        transform: translateY(-50%) scaleX(1);
     }
-    50% {
-        transform: scale(1.3);
-    }
-    100% {
-        transform: scale(1);
+    50% { 
+        opacity: 0.3;
+        transform: translateY(-50%) scaleX(0.8);
     }
 }
 
-.day-marker i.fa-check {
-    animation: checkIn 0.3s ease-out;
+/* Tamamlanan günler için zincir halka efekti */
+.day-marker.bg-green-500 {
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+/* Tamamlanmayan gerekli günler için kırık zincir efekti */
+.day-marker.bg-red-400 {
+    border-color: rgba(255, 255, 255, 0.6);
+    border-style: dashed;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+/* Zincir halka animasyonu */
+@keyframes chainLink {
+    0% {
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.3) rotate(0deg);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.day-marker i.chain-icon {
+    animation: chainLink 0.5s ease-out;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
+    transform: rotate(45deg);
+}
+
+/* Zincir halka efekti - tamamlanan günler */
+.day-marker.bg-green-500 i.chain-icon {
+    color: #ffffff;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 1);
+    transform: rotate(45deg);
+}
+
+/* Kırık zincir efekti - tamamlanmayan günler */
+.day-marker.bg-red-400 i.chain-icon {
+    color: #ffffff;
+    text-shadow: 0 0 4px rgba(239, 68, 68, 0.8);
+    animation: brokenChain 1s ease-out;
+    transform: rotate(45deg);
+}
+
+@keyframes brokenChain {
+    0% { 
+        transform: rotate(0deg);
+        opacity: 1;
+    }
+    25% { 
+        transform: rotate(-10deg);
+        opacity: 0.7;
+    }
+    50% { 
+        transform: rotate(10deg);
+        opacity: 0.5;
+    }
+    75% { 
+        transform: rotate(-5deg);
+        opacity: 0.8;
+    }
+    100% { 
+        transform: rotate(0deg);
+        opacity: 1;
+    }
 }
 
 /* Scrollbar stilleri */
@@ -89,6 +259,27 @@ body {
     padding: 8px 12px;
 }
 
+/* Zincir container */
+.chain-container {
+    background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+    padding: 8px 0;
+    border-radius: 20px;
+    position: relative;
+}
+
+/* Zincir geçmişi vurgusu */
+.chain-container::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-50%);
+    z-index: 0;
+}
+
 /* Mobil uyumluluk */
 @media (max-width: 640px) {
     .container {
@@ -98,6 +289,20 @@ body {
     .day-marker {
         width: 1.5rem !important;
         height: 1.5rem !important;
+    }
+    
+    .day-marker:not(:last-child)::after {
+        right: -8px;
+        width: 4px;
+        height: 2px;
+    }
+    
+    .day-marker.bg-green-500:not(:last-child)::after {
+        height: 2px;
+    }
+    
+    .day-marker.bg-red-400:not(:last-child)::after {
+        height: 1px;
     }
     
     .text-xs {

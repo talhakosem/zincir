@@ -6,6 +6,56 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.log('Service Worker kayıt hatası:', error));
     }
 
+    // Dark mode functionality
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    const body = document.body;
+    
+    // Load dark mode preference from localStorage
+    const loadDarkModePreference = () => {
+        const isDarkMode = localStorage.getItem('darkMode') === 'true';
+        if (isDarkMode) {
+            body.classList.add('dark');
+            updateDarkModeIcon(true);
+        } else {
+            body.classList.remove('dark');
+            updateDarkModeIcon(false);
+        }
+    };
+    
+    // Update dark mode icon
+    const updateDarkModeIcon = (isDarkMode) => {
+        const icon = darkModeToggle.querySelector('i');
+        if (isDarkMode) {
+            icon.className = 'fas fa-sun text-xl';
+            darkModeToggle.title = 'Açık Mod';
+        } else {
+            icon.className = 'fas fa-moon text-xl';
+            darkModeToggle.title = 'Karanlık Mod';
+        }
+    };
+    
+    // Toggle dark mode
+    const toggleDarkMode = () => {
+        const isDarkMode = body.classList.contains('dark');
+        if (isDarkMode) {
+            body.classList.remove('dark');
+            localStorage.setItem('darkMode', 'false');
+            updateDarkModeIcon(false);
+        } else {
+            body.classList.add('dark');
+            localStorage.setItem('darkMode', 'true');
+            updateDarkModeIcon(true);
+        }
+    };
+    
+    // Initialize dark mode
+    loadDarkModePreference();
+    
+    // Add event listener for dark mode toggle
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', toggleDarkMode);
+    }
+
     const goalInput = document.getElementById('goal-input');
     const addGoalBtn = document.getElementById('add-goal-btn');
     const goalsContainer = document.getElementById('goals-container');
@@ -121,10 +171,10 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
         
         modal.innerHTML = `
-            <div class="bg-white p-6 rounded-lg max-w-md w-full">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full transition-colors">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold">Hatırlatıcı Ayarları</h3>
-                    <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Hatırlatıcı Ayarları</h3>
+                    <button class="close-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -132,30 +182,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="mb-4">
                     <label class="flex items-center">
                         <input type="checkbox" id="reminder-enabled" ${settings.enabled ? 'checked' : ''} class="mr-2">
-                        <span class="font-semibold">Hatırlatıcıları Aktif Et</span>
+                        <span class="font-semibold text-gray-800 dark:text-white">Hatırlatıcıları Aktif Et</span>
                     </label>
                 </div>
                 
                 <div class="mb-4">
-                    <p class="font-semibold mb-2">Hatırlatma Saatleri:</p>
+                    <p class="font-semibold mb-2 text-gray-800 dark:text-white">Hatırlatma Saatleri:</p>
                     <div id="reminder-times" class="space-y-2">
                         ${settings.times.map((time, index) => `
                             <div class="flex items-center gap-2">
-                                <input type="time" value="${time}" class="reminder-time p-2 border rounded" data-index="${index}">
-                                <button class="remove-time text-red-500 hover:text-red-700" data-index="${index}">
+                                <input type="time" value="${time}" class="reminder-time p-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded transition-colors" data-index="${index}">
+                                <button class="remove-time text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300" data-index="${index}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         `).join('')}
                     </div>
-                    <button class="add-time mt-2 text-blue-600 hover:text-blue-800 text-sm font-semibold">
+                    <button class="add-time mt-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-semibold">
                         <i class="fas fa-plus"></i> Yeni Saat Ekle
                     </button>
                 </div>
                 
-                <div class="mb-4 p-3 bg-yellow-50 rounded">
-                    <p class="text-sm text-gray-700">
-                        <i class="fas fa-info-circle text-yellow-600"></i>
+                <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                    <p class="text-sm text-gray-700 dark:text-gray-300">
+                        <i class="fas fa-info-circle text-yellow-600 dark:text-yellow-400"></i>
                         Hatırlatıcılar sadece bu sayfa açıkken çalışır. Daha güçlü bildirimler için sayfayı yer imlerine ekleyip sık sık ziyaret edin.
                     </p>
                 </div>
@@ -476,19 +526,19 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
         
         modal.innerHTML = `
-            <div class="bg-white p-8 rounded-lg max-w-md w-full text-center reward-modal">
+            <div class="bg-white dark:bg-gray-800 p-8 rounded-lg max-w-md w-full text-center reward-modal transition-colors">
                 <div class="mb-6">
                     <i class="fas fa-gift text-6xl text-yellow-500 mb-4"></i>
-                    <h2 class="text-3xl font-bold text-gray-800 mb-2">Tebrikler! 🎉</h2>
-                    <p class="text-xl text-gray-600">${goal.name} hedefinde ${streak} günlük seriye ulaştın!</p>
+                    <h2 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">Tebrikler! 🎉</h2>
+                    <p class="text-xl text-gray-600 dark:text-gray-300">${goal.name} hedefinde ${streak} günlük seriye ulaştın!</p>
                 </div>
                 
-                <div class="bg-yellow-50 p-6 rounded-lg mb-6">
-                    <h3 class="text-lg font-semibold text-gray-800 mb-2">Kendine Ödül Zamanı!</h3>
-                    <p class="text-lg text-gray-700 italic">"${rewardSuggestion}"</p>
+                <div class="bg-yellow-50 dark:bg-yellow-900/20 p-6 rounded-lg mb-6">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-white mb-2">Kendine Ödül Zamanı!</h3>
+                    <p class="text-lg text-gray-700 dark:text-gray-300 italic">"${rewardSuggestion}"</p>
                 </div>
                 
-                <p class="text-gray-600 mb-6">Bu ödülü hak ettin! Kendine bu güzel şeyi yap ve motivasyonunu yüksek tut.</p>
+                <p class="text-gray-600 dark:text-gray-300 mb-6">Bu ödülü hak ettin! Kendine bu güzel şeyi yap ve motivasyonunu yüksek tut.</p>
                 
                 <button class="bg-yellow-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-colors close-modal">
                     Harika, Yapacağım!
@@ -572,10 +622,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         modal.innerHTML = `
-            <div class="bg-white p-6 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto transition-colors">
                 <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-xl font-bold">${goal.name} - Ödül Geçmişi</h3>
-                    <button class="close-modal text-gray-500 hover:text-gray-700">
+                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">${goal.name} - Ödül Geçmişi</h3>
+                    <button class="close-modal text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -609,29 +659,29 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
         
         modal.innerHTML = `
-            <div class="bg-white p-6 rounded-lg max-w-md w-full">
-                <h3 class="text-xl font-bold mb-4">Ödül Değerlendirmesi</h3>
-                <p class="text-gray-700 mb-4">Önerilen ödül: <span class="font-semibold italic">"${reward.suggestion}"</span></p>
+            <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full transition-colors">
+                <h3 class="text-xl font-bold mb-4 text-gray-800 dark:text-white">Ödül Değerlendirmesi</h3>
+                <p class="text-gray-700 dark:text-gray-300 mb-4">Önerilen ödül: <span class="font-semibold italic">"${reward.suggestion}"</span></p>
                 
                 <div class="mb-4">
-                    <label class="block text-gray-700 font-semibold mb-2">Bu ödülü yaptın mı?</label>
+                    <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Bu ödülü yaptın mı?</label>
                     <div class="flex gap-4">
                         <label class="flex items-center">
                             <input type="radio" name="completed" value="yes" class="mr-2">
-                            <span>Evet, yaptım! 🎉</span>
+                            <span class="text-gray-800 dark:text-white">Evet, yaptım! 🎉</span>
                         </label>
                         <label class="flex items-center">
                             <input type="radio" name="completed" value="no" class="mr-2">
-                            <span>Henüz yapmadım</span>
+                            <span class="text-gray-800 dark:text-white">Henüz yapmadım</span>
                         </label>
                     </div>
                 </div>
                 
                 <div class="mb-4">
-                    <label class="block text-gray-700 font-semibold mb-2">Düşüncelerin ve deneyimin:</label>
+                    <label class="block text-gray-700 dark:text-gray-300 font-semibold mb-2">Düşüncelerin ve deneyimin:</label>
                     <textarea 
                         id="reward-notes" 
-                        class="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        class="w-full p-3 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
                         rows="4"
                         placeholder="Bu ödül hakkında ne düşünüyorsun? Nasıl hissettirdi? Seni mutlu etti mi?"
                     ></textarea>
@@ -787,7 +837,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         title="${day.isRequired ? 'Gerekli Gün' : 'Opsiyonel Gün'}"
                         ${day.isFuture ? 'disabled' : ''}
                     >
-                        ${day.isCompleted ? '<i class="fas fa-check text-white text-xs"></i>' : ''}
+                        ${day.isCompleted ? '<i class="fas fa-link text-white text-xs chain-icon"></i>' : ''}
                     </div>
                 </div>
             `).join('');
@@ -835,7 +885,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </div>
                     </div>
                     <div class="overflow-x-auto pb-2">
-                        <div class="flex space-x-2 min-w-max">
+                        <div class="flex space-x-2 min-w-max chain-container">
                             ${calendarHtml}
                         </div>
                     </div>
