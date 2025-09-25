@@ -856,9 +856,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const calendarHtml = days.map((day, index) => {
                 const isConnected = connectedDays.has(index);
                 const connectionClass = isConnected ? 'connected' : '';
+                const nextDay = days[index + 1];
+                const hasNextConnection = connectedDays.has(index) && nextDay;
                 
                 return `
-                    <div class="text-center flex-shrink-0">
+                    <div class="text-center flex-shrink-0 relative">
                         <div class="text-xs">${day.dayName}</div>
                         <div class="font-bold text-base">${day.dayNum}</div>
                         <div 
@@ -868,8 +870,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             title="${day.isRequired ? 'Gerekli Gün' : 'Opsiyonel Gün'}${isConnected ? ' - Zincir Bağlantılı' : ''}"
                             ${day.isFuture ? 'disabled' : ''}
                         >
-                            ${day.isCompleted ? '<i class="fas fa-link text-white text-xs chain-icon"></i>' : ''}
+                            ${day.isCompleted ? '<i class="fas fa-link text-white text-xs"></i>' : ''}
                         </div>
+                        ${hasNextConnection ? `
+                            <div class="simple-chain-link absolute top-1/2 left-full w-4 h-1 transform -translate-y-1/2 z-10 bg-green-400 rounded-full"></div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');

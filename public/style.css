@@ -159,11 +159,22 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Zincir halka tasarımı */
+/* Basit zincir halka tasarımı */
 .day-marker {
     position: relative;
     border: 2px solid rgba(255, 255, 255, 0.3);
     transition: all 0.3s ease;
+}
+
+/* Tamamlanan günler için basit efekt */
+.day-marker.bg-green-500 {
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+/* Basit hover efekti */
+.day-marker:hover {
+    transform: scale(1.05);
 }
 
 /* Zincir bağlantısı - halkalar arasındaki çizgiler */
@@ -205,6 +216,44 @@ body {
     }
     50% { 
         box-shadow: 0 0 10px rgba(34, 197, 94, 0.8);
+    }
+}
+
+/* Zincir bağlantı efekti - yeni tamamlanan günler için */
+.day-marker.bg-green-500.connected {
+    animation: chainConnect 0.5s ease-out;
+}
+
+@keyframes chainConnect {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 rgba(34, 197, 94, 0);
+    }
+    50% {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+    }
+}
+
+/* Basit zincir bağlantısı */
+.simple-chain-link {
+    margin-left: -2px;
+    animation: simpleLinkAppear 0.3s ease-out;
+    box-shadow: 0 0 5px rgba(34, 197, 94, 0.5);
+}
+
+@keyframes simpleLinkAppear {
+    0% {
+        opacity: 0;
+        transform: translateY(-50%) scaleX(0);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(-50%) scaleX(1);
     }
 }
 
@@ -356,17 +405,14 @@ body {
     border-radius: 1px;
 }
 
-/* Bağlantılı zincirler için özel çizgi */
+/* Bağlantılı zincirler için basit çizgi */
 .chain-container.has-connections::before {
     background: linear-gradient(90deg, 
         transparent 0%, 
-        rgba(34,197,94,0.3) 20%, 
-        rgba(34,197,94,0.5) 50%, 
-        rgba(34,197,94,0.3) 80%, 
+        rgba(34,197,94,0.3) 50%, 
         transparent 100%
     );
-    height: 3px;
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
+    height: 2px;
 }
 
 /* Zincir geçmişi vurgusu */
